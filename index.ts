@@ -20,8 +20,6 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 
-
-
 // const { MongoClient, ServerApiVersion } = require('mongodb');
 import { MongoClient, ServerApiVersion } from "mongodb";
 const uri = process.env.MONGODB_URI;
@@ -37,7 +35,7 @@ const client = new MongoClient(uri!, {
 
 async function run() {
     try {
-        await client.connect();
+        // await client.connect();
 
         const database = client.db("ForexMaster-DB");
         const analysisCollection = database.collection("analysis")
@@ -65,7 +63,7 @@ async function run() {
 
 
 
-        await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // await client.close();
