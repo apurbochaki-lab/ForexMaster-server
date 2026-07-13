@@ -44,6 +44,7 @@ async function run() {
         const userCollection = database.collection('user')
 
 
+        // Add Analysis --> Post to database
         app.post("/api/post-analysis", async (req: Request, res: Response) => {
             const data = req.body;
             const newData = {
@@ -53,6 +54,12 @@ async function run() {
             // console.log(newData)
 
             const result = await analysisCollection.insertOne(newData);
+            res.json(result)
+        })
+
+        // Analysis --> get all data from database
+        app.get("/api/get-analysis", async (req: Request, res: Response) => {
+            const result = await analysisCollection.find().toArray();
             res.json(result)
         })
 
