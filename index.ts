@@ -21,10 +21,9 @@ app.get('/', (req: Request, res: Response) => {
 
 
 // const { MongoClient, ServerApiVersion } = require('mongodb');
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ObjectId, ServerApiVersion, } from "mongodb";
 const uri = process.env.MONGODB_URI;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri!, {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -61,7 +60,35 @@ async function run() {
             res.json(result)
         })
 
+        // Details Page --> get single data
+        app.get("/api/single-analysis/:id", async (req: Request, res: Response) => {
+            try {
+                const { id } = req.params as { id: string }
+                const query = {
+                    _id: new ObjectId(id)
+                }
+                const result = await analysisCollection.findOne(query)
 
+                // Analysis not found
+                if (!result) {
+                    return res.status(404).json({
+                        success: false,
+                        message: "Analysis not found"
+                    });
+                }
+
+                // Analysis Found
+                res.json(result)
+
+            } catch (error) {
+                console.error("Single Analysis Fetch Error:", error);
+
+                return res.status(500).json({
+                    success: false,
+                    message: "Internal Server Error"
+                });
+            }
+        })
 
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
