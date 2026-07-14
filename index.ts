@@ -80,6 +80,12 @@ async function run() {
             }
         }
 
+        // Featured section
+        app.get("/api/featured-charts", async (req: Request, res: Response) => {
+            const result = await analysisCollection.find({ isFeatured: true }).toArray();
+            res.json(result)
+        })
+
         // Add Analysis --> Post to database
         app.post("/api/post-analysis", verifyToken, async (req: Request, res: Response) => {
             const data = req.body;
