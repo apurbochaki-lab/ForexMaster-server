@@ -90,6 +90,37 @@ async function run() {
             }
         })
 
+        // Manage Analysis page --> get data based on authorId
+        app.get("/api/my-analysis", async (req: Request, res: Response) => {
+            try {
+                const { authorId } = req.query;
+
+                const result = await analysisCollection.find({ authorId }).sort({ createdAt: -1 }).toArray();
+                res.json(result);
+
+            } catch (error) {
+                console.error("Error fetching analysis:", error);
+                res.status(500).json({ message: "Internal server error" });
+            }
+        })
+
+        // Manage Analysis page --> delete the analysis
+        app.delete("/api/delete-analysis", async (req: Request, res: Response) => {
+            try {
+                const { analysisId } = req.query as { analysisId: string }
+                const query = {
+                    _id: new ObjectId(analysisId)
+                }
+
+                const result = await analysisCollection.deleteOne(query)
+                res.json(result)
+                
+            } catch (error) {
+                console.error("Error fetching analysis:", error);
+                res.status(500).json({ message: "Internal server error! Analysis not deleted" });
+            }
+        })
+
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
