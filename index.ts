@@ -135,13 +135,27 @@ async function run() {
             }
         })
 
-        // Manage Analysis page --> get data based on authorId
+        // Manage Analysis page --> get data based on authorId with Pagination
         app.get("/api/my-analysis", verifyToken, async (req: Request, res: Response) => {
             try {
                 const { authorId } = req.query;
 
-                const result = await analysisCollection.find({ authorId }).sort({ createdAt: -1 }).toArray();
-                res.json(result);
+                const page = Number(req.query.page) || 1;
+                const limit = Number(req.query.limit) || 6;
+                const skip = (page - 1) * limit;
+
+                const result = await analysisCollection
+                    .find({ authorId })
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(limit)
+                    .toArray()
+
+                // Total page calculation
+                const totalData = await analysisCollection.countDocuments({ authorId });
+                const totalPages = Math.ceil(totalData / limit);
+
+                res.json({ data: result, page, totalPages, totalData });
 
             } catch (error) {
                 console.error("Error fetching analysis:", error);
@@ -165,6 +179,8 @@ async function run() {
                 res.status(500).json({ message: "Internal server error! Analysis not deleted" });
             }
         })
+
+
 
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
