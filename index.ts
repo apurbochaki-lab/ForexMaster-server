@@ -45,7 +45,6 @@ async function run() {
 
         const database = client.db("ForexMaster-DB");
         const analysisCollection = database.collection("analysis")
-        const userCollection = database.collection('user')
 
 
         // Verification
@@ -82,28 +81,55 @@ async function run() {
 
         // Featured section
         app.get("/api/featured-charts", async (req: Request, res: Response) => {
-            const result = await analysisCollection.find({ isFeatured: true }).toArray();
-            res.json(result)
-        })
+            try {
+                const result = await analysisCollection.find({ isFeatured: true }).toArray();
+                res.json(result);
+
+            } catch (error) {
+                console.error("Error fetching featured charts:", error);
+                return res.status(500).json({
+                    success: false,
+                    message: "Internal Server Error: Failed to fetch featured charts"
+                });
+            }
+        });
 
         // Add Analysis --> Post to database
         app.post("/api/post-analysis", verifyToken, async (req: Request, res: Response) => {
-            const data = req.body;
-            const newData = {
-                ...data,
-                createdAt: new Date()
-            }
-            // console.log(newData)
+            try {
+                const data = req.body;
+                const newData = {
+                    ...data,
+                    createdAt: new Date()
+                };
+                // console.log(newData)
 
-            const result = await analysisCollection.insertOne(newData);
-            res.json(result)
-        })
+                const result = await analysisCollection.insertOne(newData);
+                res.json(result);
+
+            } catch (error) {
+                console.error("Error posting analysis:", error);
+                return res.status(500).json({
+                    success: false,
+                    message: "Internal Server Error: Failed to post analysis"
+                });
+            }
+        });
 
         // Analysis --> get all data from database
         app.get("/api/get-analysis", async (req: Request, res: Response) => {
-            const result = await analysisCollection.find().sort({ createdAt: -1 }).toArray();
-            res.json(result)
-        })
+            try {
+                const result = await analysisCollection.find().sort({ createdAt: -1 }).toArray();
+                res.json(result);
+                
+            } catch (error) {
+                console.error("Error fetching all analysis:", error);
+                return res.status(500).json({
+                    success: false,
+                    message: "Internal Server Error: Failed to fetch analysis data"
+                });
+            }
+        });
 
         // Details Page --> get single data
         app.get("/api/single-analysis/:id", async (req: Request, res: Response) => {
